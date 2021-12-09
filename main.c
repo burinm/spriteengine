@@ -55,7 +55,7 @@ if(t == NULL) {
 #define BITS_PER_ALPHA    (8)
 #define BITS_PER_PIXEL  (BITS_PER_RED + BITS_PER_GREEN + BITS_PER_BLUE + BITS_PER_ALPHA)
 #define BYTES_PER_PIXEL   (BITS_PER_PIXEL / 8)
-#define TEXTURE_PITCH   (RESOLUTION_X * BITS_PER_PIXEL)
+#define TEXTURE_PITCH   (RESOLUTION_X * BYTES_PER_PIXEL)
 #define TOTAL_TEXTURE_BUFFER (TEXTURE_PITCH * RESOLUTION_Y)
 
 uint8_t *pixels = malloc(TOTAL_TEXTURE_BUFFER * sizeof(uint8_t));
@@ -98,20 +98,16 @@ while(running) {
                         uint8_t* _p = pixels;
                         int counter = 0;
                         for (int j=0; j<RESOLUTION_Y; j++) {
-                            for (int k=0; k<WINDOW_SCALE; k++) {
-                                for (int i=0; i<RESOLUTION_X; i++) { //
-                                    for (int z=0; z<WINDOW_SCALE; z++) {
-                                        int r_pixel_color = rand() %255; 
-                                        int g_pixel_color = rand() %255; 
-                                        int b_pixel_color = rand() %255; 
-                                        *_p++ = r_pixel_color;
-                                        *_p++ = g_pixel_color;
-                                        *_p++ = b_pixel_color;
-                                        *_p++ = 0; //alpha?
-                                        counter+=4;
-                                    }
-                                }
-                            } 
+                            for (int i=0; i<RESOLUTION_X; i++) { //
+                                int r_pixel_color = rand() %255;
+                                int g_pixel_color = rand() %255;
+                                int b_pixel_color = rand() %255;
+                                *_p++ = r_pixel_color;
+                                *_p++ = g_pixel_color;
+                                *_p++ = b_pixel_color;
+                                *_p++ = 0; //alpha?
+                                counter+=4;
+                            }
                         }
                         printf("counter = %d is good %d (%d)\n", counter, counter == TOTAL_TEXTURE_BUFFER, TOTAL_TEXTURE_BUFFER);
                     }
@@ -119,7 +115,7 @@ while(running) {
                         break;
                      case SDLK_t:
                         for (int i=0; i<TOTAL_TEXTURE_BUFFER; i++) {
-                            pixels[i] = rand() %255;
+                            pixels[i] = 0xee;
                         }
                         break;
                     case SDLK_c: //clear
