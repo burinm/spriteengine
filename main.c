@@ -9,9 +9,7 @@
 #include "blitz_n_chips.h"
 
 #include "machine.h"
-#define SCALE_WINDOW    (2)
-#define SCREEN_X        (RESOLUTION_X * SCALE_WINDOW)
-#define SCREEN_Y        (RESOLUTION_Y * SCALE_WINDOW)
+#define WINDOW_SCALE    (2)
 #define SURFACE_DEPTH   (4)
 
 static volatile int running = 1;
@@ -19,17 +17,11 @@ int main() {
 
 SDL_Init(SDL_INIT_VIDEO);
 
-/*
-SDL_Window *w = SDL_CreateWindow(
-                "RGB 320x240 Qqvga",
-                0, 0,
-                SCREEN_X,
-                SCREEN_Y,
-                0);
-*/
-
 SDL_Window *w;
 SDL_Renderer *r;
+
+#define SCREEN_X        (RESOLUTION_X * WINDOW_SCALE)
+#define SCREEN_Y        (RESOLUTION_Y * WINDOW_SCALE)
 if (SDL_CreateWindowAndRenderer(
                 SCREEN_X, SCREEN_Y,
                 SDL_WINDOW_RESIZABLE,
@@ -45,23 +37,12 @@ if (w == NULL) {
 
 g_clear_render(r);
 
-/*
-SDL_Surface *srgb = SDL_CreateRGBSurface(
-                0,
-                SCREEN_X, 
-                SCREEN_Y,
-                SURFACE_DEPTH,
-                0,0,0,0);
-
-g_clear_screen(srgb);
-*/
-
 SDL_Texture *t = SDL_CreateTexture(
         r,
         SDL_PIXELFORMAT_RGB888,
+        //SDL_PIXELFORMAT_RGB332,
         SDL_TEXTUREACCESS_STREAMING,
-        //SCREEN_X, SCREEN_Y);
-        RESOLUTION_X / 4, RESOLUTION_Y / 4);
+        RESOLUTION_X, RESOLUTION_Y);
 
 if(t == NULL) {
     printf("Texture Null: %s\n", SDL_GetError());
@@ -74,9 +55,10 @@ if(t == NULL) {
 #define BITS_PER_ALPHA    (8)
 #define BITS_PER_PIXEL  (BITS_PER_RED + BITS_PER_GREEN + BITS_PER_BLUE + BITS_PER_ALPHA)
 #define BYTES_PER_PIXEL   (BITS_PER_PIXEL / 8)
-#define TEXTURE_PITCH   (SCREEN_X * BITS_PER_PIXEL)
-#define TOTAL_SCREEN_BUFFER (TEXTURE_PITCH * SCREEN_Y)
-uint8_t *pixels = malloc(TOTAL_SCREEN_BUFFER * sizeof(uint8_t));
+#define TEXTURE_PITCH   (RESOLUTION_X * BITS_PER_PIXEL)
+#define TOTAL_TEXTURE_BUFFER (TEXTURE_PITCH * RESOLUTION_Y)
+
+uint8_t *pixels = malloc(TOTAL_TEXTURE_BUFFER * sizeof(uint8_t));
 if (pixels == NULL) {
     printf("Coudlnt' allocate pixel buffer!\n");
     return -1;
@@ -114,10 +96,11 @@ while(running) {
                         }
                         */
                         uint8_t* _p = pixels;
+                        int counter = 0;
                         for (int j=0; j<RESOLUTION_Y; j++) {
-                            for (int k=0; k<SCALE_WINDOW; k++) {
+                            for (int k=0; k<WINDOW_SCALE; k++) {
                                 for (int i=0; i<RESOLUTION_X; i++) { //
-                                    for (int z=0; z<SCALE_WINDOW; z++) {
+                                    for (int z=0; z<WINDOW_SCALE; z++) {
                                         int r_pixel_color = rand() %255; 
                                         int g_pixel_color = rand() %255; 
                                         int b_pixel_color = rand() %255; 
@@ -125,24 +108,35 @@ while(running) {
                                         *_p++ = g_pixel_color;
                                         *_p++ = b_pixel_color;
                                         *_p++ = 0; //alpha?
+                                        counter+=4;
                                     }
                                 }
                             } 
                         }
-                        SDL_UpdateTexture(t, NULL, pixels, TEXTURE_PITCH);
-
-                        SDL_RenderClear(r);
-                        SDL_RenderCopy(r, t, NULL, NULL);
-                        SDL_RenderPresent(r);
+                        printf("counter = %d is good %d (%d)\n", counter, counter == TOTAL_TEXTURE_BUFFER, TOTAL_TEXTURE_BUFFER);
                     }
 
                         break;
+                     case SDLK_t:
+                        for (int i=0; i<TOTAL_TEXTURE_BUFFER; i++) {
+                            pixels[i] = rand() %255;
+                        }
+                        break;
                     case SDLK_c: //clear
-                        g_clear_render(r);
+                        for (int i=0; i<TOTAL_TEXTURE_BUFFER; i++) {
+                            pixels[i] = 0;
+                        }
                         break;
                     default:
                         printf("key:%d\n", e.key.keysym.sym);
                 }
+
+                //Always update renderer
+                    SDL_UpdateTexture(t, NULL, pixels, TEXTURE_PITCH);
+
+                    SDL_RenderClear(r);
+                    SDL_RenderCopy(r, t, NULL, NULL);
+                    SDL_RenderPresent(r);
                 break;
             case SDL_QUIT:
                 running = 0;
