@@ -125,6 +125,7 @@ while(running) {
                                         goto bail;
                                     }
 
+                                    // One bit of character, highest bit first
                                     if (CHARACTER_ROM_mem[rom] & (1<<(7-j))) {
                                         pixels[v+h+0 + pos_x + pos_y] = 0xff; 
                                         pixels[v+h+1 + pos_x + pos_y] = 0xff;
@@ -137,7 +138,7 @@ while(running) {
                                         pixels[v+h+3 + pos_x + pos_y] = 0;
                                     }
                                 }
-                                rom++; //next line of character
+                                rom++; //Next line of character
                             }
                             // Next character
                             pos_x += 8 * BYTES_PER_PIXEL;
