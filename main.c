@@ -8,6 +8,7 @@
 #include "graphics.h"
 #include "blitz_n_chips.h"
 #include "machine.h"
+#include "screen_matrix.h"
 
 #include "machine.h"
 #define WINDOW_SCALE    (2)
@@ -81,6 +82,12 @@ while(running) {
                     case SDLK_q:
                         running = 0;
                         printf("stopping...\n");
+                        break;
+                    case SDLK_l: //load screen matrix
+                        if (load_screen_matrix("sample_matrix.bg") != 0) {
+                            printf("couldn't load: sample_matrix.bg\n");
+                        }
+                        break;
                     case SDLK_b:{  //blit
                         /*
                         for (int i=0; i<TOTAL_SCREEN_BUFFER; i++) {

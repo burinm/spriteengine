@@ -13,27 +13,30 @@ int machine_init_mem() {
 
 //Screen memory
 
+#if 0
 int screen_fd = open("mem/screen", O_CREAT | O_RDWR);
 if (screen_fd == -1) {
     perror("couldn't open screen file:");
     return -1;
 }
+#endif
 
-#define SCREEN_MEM_SZ   (size_t)((RESOLUTION_X / 8) * (RESOLUTION_Y / 8))
-SRCEEN_RAM_mem = mmap(NULL, SCREEN_MEM_SZ, PROT_READ|PROT_WRITE, MAP_SHARED, screen_fd, 0);   
+printf("Screen matrix (x,y) (%zu,%zu) characters\n", SCREEN_MATRIX_X, SCREEN_MATRIX_Y);
+
+SRCEEN_RAM_mem = mmap(NULL, SCREEN_MEM_SZ, PROT_READ|PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
 if (SRCEEN_RAM_mem == MAP_FAILED) {
     perror("couldn't mmap screen ram:");
     return -1;
 }
 
-printf("[%p] - screen memory of %zu bytes mapped\n", SRCEEN_RAM_mem, SCREEN_MEM_SZ);
+printf("[%p] - [screen memory RAM] mmap (%zu bytes mapped)\n", SRCEEN_RAM_mem, SCREEN_MEM_SZ);
 
 
 //Character rom
 
 size_t page_sz = sysconf(_SC_PAGE_SIZE);
 
-size_t length = (CHAR_ROM_SZ / page_sz) * page_sz; 
+size_t length = (CHAR_ROM_SZ / page_sz) * page_sz;
 
 if ((length % page_sz) != 0) {
     length += page_sz;
@@ -52,7 +55,7 @@ if (CHARACTER_ROM_mem == MAP_FAILED) {
     return -1;
 }
 
-printf("[%p] - (page size %zu) for mmap file size %zu bytes mapped\n", CHARACTER_ROM_mem, page_sz, length);
+printf("[%p] - [character ROM] (page size %zu) mmap (file size %zu bytes)\n", CHARACTER_ROM_mem, page_sz, length);
 
 
 return 0;
