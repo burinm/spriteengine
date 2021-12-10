@@ -1,2 +1,2 @@
 #!/bin/bash
-gcc main.c blitz_n_chips.c graphics.c -I/opt/SDL/include -lSDL2
+gcc -g -Wall main.c blitz_n_chips.c graphics.c machine.c -I/opt/SDL/include -lSDL2

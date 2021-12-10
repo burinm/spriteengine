@@ -7,6 +7,7 @@
 
 #include "graphics.h"
 #include "blitz_n_chips.h"
+#include "machine.h"
 
 #include "machine.h"
 #define WINDOW_SCALE    (2)
@@ -14,6 +15,11 @@
 
 static volatile int running = 1;
 int main() {
+
+if (machine_init_mem() != 0) {
+    printf("Failed to init machine.\n");
+    return -1;
+}
 
 SDL_Init(SDL_INIT_VIDEO);
 
@@ -65,20 +71,6 @@ if (pixels == NULL) {
 }
 
 
-
-/*
-SDL_Surface *ws = SDL_GetWindowSurface(w);
-
-if(ws == NULL) {
-    printf("Window Surface Null: %s\n", SDL_GetError());
-    return -1;
-}
-
-if (SDL_BlitSurface(srgb,NULL,ws,NULL) != 0) {
-    printf("Problem updating window: %s\n", SDL_GetError());
-    return -1;
-}
-*/
                 
 SDL_Event e;
 while(running) {
@@ -113,10 +105,50 @@ while(running) {
                     }
 
                         break;
-                     case SDLK_t:
+                    case SDLK_t:
                         for (int i=0; i<TOTAL_TEXTURE_BUFFER; i++) {
                             pixels[i] = 0xee;
                         }
+                        break;
+                    case SDLK_u: {
+                        int pos_x = 0;
+                        int pos_y = 0;
+                        int rom = 0;
+                        do {
+                            for (int k=0; k<8; k++) {
+                                int v = k * RESOLUTION_X * BYTES_PER_PIXEL;
+                                for (int j=0; j<8; j++) { 
+                                    int h = (j * BYTES_PER_PIXEL);
+
+                                    if ( (v + h + pos_x + pos_y + BYTES_PER_PIXEL) >= TOTAL_TEXTURE_BUFFER) {
+                                        printf("overrun!\n");
+                                        goto bail;
+                                    }
+
+                                    if (CHARACTER_ROM_mem[rom] & (1<<(8-j))) {
+                                        pixels[v+h+0 + pos_x + pos_y] = 0xff; 
+                                        pixels[v+h+1 + pos_x + pos_y] = 0xff;
+                                        pixels[v+h+2 + pos_x + pos_y] = 0xff;
+                                        pixels[v+h+3 + pos_x + pos_y] = 0;
+                                    } else {
+                                        pixels[v+h+0 + pos_x + pos_y] = 0;
+                                        pixels[v+h+1 + pos_x + pos_y] = 0;
+                                        pixels[v+h+2 + pos_x + pos_y] = 0;
+                                        pixels[v+h+3 + pos_x + pos_y] = 0;
+                                    }
+                                }
+                                rom++; //next line of character
+                            }
+                            // Next character
+                            pos_x += 8 * BYTES_PER_PIXEL;
+                            if (pos_x > ((RESOLUTION_X * BYTES_PER_PIXEL) - (BYTES_PER_PIXEL * 8))) {
+                                pos_x = 0;
+                                pos_y += RESOLUTION_X * BYTES_PER_PIXEL * 8;
+                            }
+                            printf("pos_x %d, pos_y %d\n", pos_x, pos_y);
+                        } while (rom < CHAR_ROM_SZ -1);
+                    }
+                        bail:
                         break;
                     case SDLK_c: //clear
                         for (int i=0; i<TOTAL_TEXTURE_BUFFER; i++) {
@@ -142,15 +174,8 @@ while(running) {
                 //printf("Unhandled event %d\n", e.type);
                 break;
         }
-
-
     }
-    
-
-
-
 }
-
 
 //SDL_FreeSurface(srgb);
 if(pixels) { free(pixels); }
@@ -158,12 +183,4 @@ SDL_DestroyTexture(t);
 
 SDL_DestroyWindow(w);
 SDL_Quit();
-
-
-
-
-
-
-
-
 }
