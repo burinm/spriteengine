@@ -125,7 +125,7 @@ while(running) {
                                         goto bail;
                                     }
 
-                                    if (CHARACTER_ROM_mem[rom] & (1<<(8-j))) {
+                                    if (CHARACTER_ROM_mem[rom] & (1<<(7-j))) {
                                         pixels[v+h+0 + pos_x + pos_y] = 0xff; 
                                         pixels[v+h+1 + pos_x + pos_y] = 0xff;
                                         pixels[v+h+2 + pos_x + pos_y] = 0xff;
