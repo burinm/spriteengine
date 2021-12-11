@@ -17,6 +17,8 @@
 static volatile int running = 1;
 int main() {
 
+
+
 if (machine_init_mem() != 0) {
     printf("Failed to init machine.\n");
     return -1;
@@ -63,7 +65,17 @@ if (pixels == NULL) {
     return -1;
 }
 
+//Go!
 
+//start vsync timer
+#if 0
+vsync_params_t vp_t = { .pixels = pixels };
+SDL_TimerID timer_vsync;
+if ( (timer_vsync = SDL_AddTimer(17, do_vsync, &vp_t)) == 0) {
+    printf("Couldn't start v_sync timer\n");
+    return -1;
+}
+#endif
                 
 SDL_Event e;
 while(running) {

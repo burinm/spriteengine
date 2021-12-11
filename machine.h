@@ -1,6 +1,8 @@
 #ifndef __MACHINE_H__
 #define __MACHINE_H__
 
+#include <stdint.h>
+
 #define RESOLUTION_X    (320)
 #define RESOLUTION_Y    (240)
 
@@ -17,9 +19,16 @@ const volatile uint32_t PALLET_ROM_mem[PALLET_ROM_SZ];
 #define SCREEN_MEM_SZ   (SCREEN_MATRIX_X * SCREEN_MATRIX_Y)
 volatile uint8_t* SRCEEN_RAM_mem;
 
+typedef struct {
+    uint8_t *pixels;
+} vsync_params_t;
+
 int machine_init_mem(void);
 
 void machine_clear_screen_matrix(void);
+
+//callbacks
+uint32_t do_vsync(uint32_t interval, void* param);
 
 #endif
 

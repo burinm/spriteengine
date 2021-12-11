@@ -8,6 +8,7 @@
 #include <unistd.h>
 
 #include "machine.h"
+#include "screen_matrix.h" //TODO: refactor, is this a dependency
 
 /* Got these from here:
 https://lospec.com/palette-list/nintendo-entertainment-system
@@ -119,4 +120,13 @@ void machine_clear_screen_matrix(void) {
         SRCEEN_RAM_mem[i] = 0;
     }
 
+}
+
+uint32_t do_vsync(uint32_t interval, void* param) {
+    vsync_params_t *v_param = (vsync_params_t*)param;
+
+    //msync(SRCEEN_RAM_mem, SCREEN_MEM_SZ, MS_SYNC);
+    screen_render_from_matrix(v_param->pixels);
+//printf("tick\n");
+return (interval);
 }
