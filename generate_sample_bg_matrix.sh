@@ -24,4 +24,4 @@ for i in `seq 0 39`;
     do echo -n -e \\x2a >> $SAMPLE;  # * asters
 done
 
-eval ./generate_screencode_asci.sh "SPRITEENGINE_V1" | dd of=$SAMPLE bs=1 seek=$(($TEXT_OFFSET * $CHARACTERS_PER_ROW + $TEXT_OFFSET)) conv=notrunc
+eval ./generate_screencode_asci.sh "SPRITEENGINE_V1.0" | dd of=$SAMPLE bs=1 seek=$(($TEXT_OFFSET * $CHARACTERS_PER_ROW + $TEXT_OFFSET)) conv=notrunc
