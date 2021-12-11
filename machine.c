@@ -78,6 +78,14 @@ if (SRCEEN_RAM_mem == MAP_FAILED) {
 
 printf("[%p] - [screen memory RAM] mmap (%zu bytes mapped)\n", SRCEEN_RAM_mem, SCREEN_MEM_SZ);
 
+#if 0
+if (mlock(SRCEEN_RAM_mem, SCREEN_MEM_SZ) == -1) {
+    perror("couldn't lock screen ram:");
+    goto error;
+    return -1;
+}
+#endif
+
 
 //Character rom
 
