@@ -56,14 +56,6 @@ if(t == NULL) {
     return -1;
 }
 
-#define BITS_PER_RED      (8)
-#define BITS_PER_GREEN    (8)
-#define BITS_PER_BLUE     (8)
-#define BITS_PER_ALPHA    (8)
-#define BITS_PER_PIXEL  (BITS_PER_RED + BITS_PER_GREEN + BITS_PER_BLUE + BITS_PER_ALPHA)
-#define BYTES_PER_PIXEL   (BITS_PER_PIXEL / 8)
-#define TEXTURE_PITCH   (RESOLUTION_X * BYTES_PER_PIXEL)
-#define TOTAL_TEXTURE_BUFFER (TEXTURE_PITCH * RESOLUTION_Y)
 
 uint8_t *pixels = malloc(TOTAL_TEXTURE_BUFFER * sizeof(uint8_t));
 if (pixels == NULL) {
@@ -88,8 +80,17 @@ while(running) {
                             printf("couldn't load: sample_matrix.bg\n");
                         }
                         break;
+                    case SDLK_d: //dump screen matrix
+                        for (int j=0; j<SCREEN_MATRIX_Y; j++) {
+                            for (uint i=0; i<SCREEN_MATRIX_X; i++) {
+                                printf("%.2x", SRCEEN_RAM_mem[i + j * SCREEN_MATRIX_X]);
+                            }
+                            printf("\n");
+                        }
+                        printf("\n");
+                        break;
                     case SDLK_s: //Render screen from matrix 
-                        //TODO: screen_render_from_matrix();
+                        screen_render_from_matrix(pixels);
                         break;
                     case SDLK_b:{  //blit
                         /*

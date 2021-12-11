@@ -16,18 +16,25 @@ void g_clear_render(SDL_Renderer *r) {
     
 }
 
-#if 0
-void screen_render_from_matrix(uint8_t * t) {
-    uint8_t *p = (volatile uint8_t *)SRCEEN_RAM_mem;
-    for (i=0; i<TOTAL_TEXTURE_BUFFER; i++) {
+void screen_render_from_matrix(uint8_t *p) {
+assert(TOTAL_TEXTURE_BUFFER == SCREEN_MEM_SZ * (8 * 8) * BYTES_PER_PIXEL);
+
+    for (int j=0; j<SCREEN_MATRIX_Y; j++) {
+        for (uint i=0; i<SCREEN_MATRIX_X; i++) {
+            for (int line=0; line<8; line++) {
+                plot_character_line(&p, SRCEEN_RAM_mem[i + j*SCREEN_MATRIX_X], line);
+            }
+        }
+        
 
     }
 }
-#endif
 
 
-int _screen_get_char_pos(int screencode) {
-    return (screencode * 8);
+int _screen_get_screencode_pos(int screencode, uint8_t line) {
+assert(line < 8);
+
+    return (screencode * 8 + line);
 }
 
 int plot_pixel(uint8_t **p, int color) {
@@ -44,4 +51,16 @@ int plot_pixel(uint8_t **p, int color) {
     *(*p)++ = 0; //alpha?
 
 return 4;
+}
+
+void plot_character_line(uint8_t **p, uint8_t screencode, uint8_t line) {
+
+    for (int i=0; i<8; i++) {
+        if (CHARACTER_ROM_mem[_screen_get_screencode_pos(screencode, line)] & (1<<(7-i))) {
+            plot_pixel(p, PALLET_COLOR_NES_WHITE);
+        } else {
+            plot_pixel(p, PALLET_COLOR_NES_BLACK);
+        }
+    }
+
 }
