@@ -34,19 +34,44 @@ int machine_init_mem() {
 
 //Screen memory
 
-#if 0
 int screen_fd = open("mem/screen", O_CREAT | O_RDWR);
 if (screen_fd == -1) {
     perror("couldn't open screen file:");
     return -1;
 }
-#endif
+
+//Alternatively, this could be dd'ed from command line
+for (int i=0; i<SCREEN_MEM_SZ; i++) {
+    if (write(screen_fd, "\0", 1) == -1) {
+        perror("problem creating screen backing file");
+        goto error;
+        return -1;
+    }
+}
+
+struct stat stat_buf;
+    if (fstat(screen_fd, &stat_buf) != 0) {
+        perror("couldn't stat screen memory file:");
+        goto error;
+        return -1;
+    }
+
+//Check to see if ram was corrupted
+if (stat_buf.st_size != SCREEN_MEM_SZ) {
+    printf("Screen ram memory must be %zu bytes!\n", SCREEN_MEM_SZ);
+    goto error;
+    return -1;
+}
+
+
 
 printf("Screen matrix (x,y) (%zu,%zu) characters\n", SCREEN_MATRIX_X, SCREEN_MATRIX_Y);
 
-SRCEEN_RAM_mem = mmap(NULL, SCREEN_MEM_SZ, PROT_READ|PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
+//SRCEEN_RAM_mem = mmap(NULL, SCREEN_MEM_SZ, PROT_READ|PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
+SRCEEN_RAM_mem = mmap(NULL, SCREEN_MEM_SZ, PROT_READ|PROT_WRITE, MAP_SHARED, screen_fd, 0);
 if (SRCEEN_RAM_mem == MAP_FAILED) {
     perror("couldn't mmap screen ram:");
+    goto error;
     return -1;
 }
 
@@ -66,6 +91,7 @@ if ((length % page_sz) != 0) {
 int char_fd = open("c64.bin", O_RDONLY);
 if (char_fd == -1) {
     perror("couldn't open character rom:");
+    goto error;
     return -1;
 }
 
@@ -73,6 +99,7 @@ if (char_fd == -1) {
 CHARACTER_ROM_mem = mmap(NULL, length, PROT_READ, MAP_PRIVATE, char_fd, 0);   
 if (CHARACTER_ROM_mem == MAP_FAILED) {
     perror("couldn't mmap character rom:");
+    goto error;
     return -1;
 }
 
@@ -80,6 +107,11 @@ printf("[%p] - [character ROM] (page size %zu) mmap (file size %zu bytes)\n", CH
 
 
 return 0;
+
+error:
+    //TODO clean up mmap and other resources
+    close(screen_fd);
+    return -1;
 }
 
 void machine_clear_screen_matrix(void) {
