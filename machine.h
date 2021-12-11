@@ -5,12 +5,15 @@
 #define RESOLUTION_Y    (240)
 
 #define CHAR_ROM_SZ     (4096)
-const volatile int8_t* CHARACTER_ROM_mem;
+const volatile uint8_t* CHARACTER_ROM_mem;
+
+#define PALLET_ROM_SZ     (64)
+const volatile uint32_t PALLET_ROM_mem[PALLET_ROM_SZ];
 
 #define SCREEN_MATRIX_X (size_t)(RESOLUTION_X / 8)
 #define SCREEN_MATRIX_Y (size_t)(RESOLUTION_Y / 8)
 #define SCREEN_MEM_SZ   (SCREEN_MATRIX_X * SCREEN_MATRIX_Y)
-volatile int8_t* SRCEEN_RAM_mem;
+volatile uint8_t* SRCEEN_RAM_mem;
 
 int machine_init_mem(void);
 

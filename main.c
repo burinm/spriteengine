@@ -88,6 +88,9 @@ while(running) {
                             printf("couldn't load: sample_matrix.bg\n");
                         }
                         break;
+                    case SDLK_s: //Render screen from matrix 
+                        //TODO: screen_render_from_matrix();
+                        break;
                     case SDLK_b:{  //blit
                         /*
                         for (int i=0; i<TOTAL_SCREEN_BUFFER; i++) {
@@ -98,14 +101,8 @@ while(running) {
                         int counter = 0;
                         for (int j=0; j<RESOLUTION_Y; j++) {
                             for (int i=0; i<RESOLUTION_X; i++) { //
-                                int r_pixel_color = rand() %255;
-                                int g_pixel_color = rand() %255;
-                                int b_pixel_color = rand() %255;
-                                *_p++ = r_pixel_color;
-                                *_p++ = g_pixel_color;
-                                *_p++ = b_pixel_color;
-                                *_p++ = 0; //alpha?
-                                counter+=4;
+                                int pixel_color = rand() %PALLET_ROM_SZ;
+                                counter += plot_pixel(&_p, pixel_color);
                             }
                         }
                         printf("counter = %d is good %d (%d)\n", counter, counter == TOTAL_TEXTURE_BUFFER, TOTAL_TEXTURE_BUFFER);
