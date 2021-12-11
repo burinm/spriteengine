@@ -11,6 +11,8 @@
 #include "screen_matrix.h"
 
 #include "machine.h"
+#include "spriteengine.h"
+
 #define WINDOW_SCALE    (2)
 #define SURFACE_DEPTH   (4)
 

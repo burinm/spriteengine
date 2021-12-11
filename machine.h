@@ -49,14 +49,15 @@ const volatile uint32_t PALLET_ROM_mem[PALLET_ROM_SZ];
     B - border
     . - max area that will be displayed
 */
-#define SCREEN_MATRIX_X (size_t)36
-#define SCREEN_MATRIX_Y (size_t)28
+#define SCREEN_MATRIX_X (36)
+#define SCREEN_MATRIX_Y (28)
 #define SCREEN_MEM_SZ   (SCREEN_MATRIX_X * SCREEN_MATRIX_Y)
 volatile uint8_t* SRCEEN_RAM_mem;
 
 //Where to draw the screen from the upper-left
-#define SCREEN_PIXEL_X_OFFSET   (1 * TILE_SZ)
-#define SCREEN_PIXEL_Y_OFFSET   (1 * TILE_SZ)
+//TODO: make this generic so screen_render_from_matrix can be changed...
+#define SCREEN_TILE_X_OFFSET   (1)
+#define SCREEN_TILE_Y_OFFSET   (1)
 
 typedef struct {
     uint8_t *pixels;

@@ -23,7 +23,7 @@ int matrix_fd = open(matrix, O_RDONLY);
     }
 
     if (stat_buf.st_size != SCREEN_MEM_SZ) {
-        printf("Screen matrix file must be (%zu x %zu) %zu bytes\n",
+        printf("Screen matrix file must be (%u x %u) %u bytes\n",
             SCREEN_MATRIX_X, SCREEN_MATRIX_Y, SCREEN_MEM_SZ);  
         return -1;
     }

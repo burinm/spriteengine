@@ -59,14 +59,14 @@ struct stat stat_buf;
 
 //Check to see if ram was corrupted
 if (stat_buf.st_size != SCREEN_MEM_SZ) {
-    printf("Screen ram memory must be %zu bytes!\n", SCREEN_MEM_SZ);
+    printf("Screen ram memory must be %u bytes!\n", SCREEN_MEM_SZ);
     goto error;
     return -1;
 }
 
 
 
-printf("Screen matrix (x,y) (%zu,%zu) characters\n", SCREEN_MATRIX_X, SCREEN_MATRIX_Y);
+printf("Screen matrix (x,y) (%u,%u) characters\n", SCREEN_MATRIX_X, SCREEN_MATRIX_Y);
 
 //SRCEEN_RAM_mem = mmap(NULL, SCREEN_MEM_SZ, PROT_READ|PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
 SRCEEN_RAM_mem = mmap(NULL, SCREEN_MEM_SZ, PROT_READ|PROT_WRITE, MAP_SHARED, screen_fd, 0);
@@ -76,7 +76,7 @@ if (SRCEEN_RAM_mem == MAP_FAILED) {
     return -1;
 }
 
-printf("[%p] - [screen memory RAM] mmap (%zu bytes mapped)\n", SRCEEN_RAM_mem, SCREEN_MEM_SZ);
+printf("[%p] - [screen memory RAM] mmap (%u bytes mapped)\n", SRCEEN_RAM_mem, SCREEN_MEM_SZ);
 
 #if 0
 if (mlock(SRCEEN_RAM_mem, SCREEN_MEM_SZ) == -1) {
