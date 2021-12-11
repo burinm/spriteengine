@@ -5,22 +5,27 @@ TEXT_OFFSET=10
 TEXT_ROW_OFFSET=10
 CHARACTERS_PER_ROW=40
 
+SCREEN_MATRIX_X=36
+SCREEN_MATRIX_Y=28
+
 rm -f $SAMPLE
 
-for i in `seq 0 39`
-    do echo -n -e \\x2a >> $SAMPLE;  # * asters
+
+for i in `seq 0 $(($SCREEN_MATRIX_X - $((1))))`
+    do
+        echo -n -e \\x2a >> $SAMPLE;  # * asters
 done
 
-for j in `seq 0 27`
+for j in `seq 0 $(($SCREEN_MATRIX_Y - $((3))))`
 do
     echo -n -e \\x2a >> $SAMPLE  # * asters
-    for i in `seq 0 37`
+    for i in `seq 0 $(($SCREEN_MATRIX_X - $((3))))`
         do echo -n -e \\x20 >> $SAMPLE;  # [ ] spaces
     done
     echo -n -e \\x2a >> $SAMPLE;  # * asters
 done
 
-for i in `seq 0 39`;
+for i in `seq 0 $(($SCREEN_MATRIX_X - $((1))))`;
     do echo -n -e \\x2a >> $SAMPLE;  # * asters
 done
 
