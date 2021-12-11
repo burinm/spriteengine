@@ -81,3 +81,10 @@ printf("[%p] - [character ROM] (page size %zu) mmap (file size %zu bytes)\n", CH
 
 return 0;
 }
+
+void machine_clear_screen_matrix(void) {
+    for (int i=0; i<SCREEN_MEM_SZ; i++) {
+        SRCEEN_RAM_mem[i] = 0;
+    }
+
+}

@@ -89,8 +89,11 @@ while(running) {
                         }
                         printf("\n");
                         break;
-                    case SDLK_s: //Render screen from matrix 
+                    case SDLK_r: //Render screen from matrix 
                         screen_render_from_matrix(pixels);
+                        break;
+                    case SDLK_e: //Render screen from matrix 
+                        machine_clear_screen_matrix();
                         break;
                     case SDLK_b:{  //blit
                         /*

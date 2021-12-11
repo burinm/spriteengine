@@ -19,5 +19,7 @@ volatile uint8_t* SRCEEN_RAM_mem;
 
 int machine_init_mem(void);
 
+void machine_clear_screen_matrix(void);
+
 #endif
 
