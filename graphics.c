@@ -19,13 +19,14 @@ void g_clear_render(SDL_Renderer *r) {
 void screen_render_from_matrix(uint8_t *p) {
 assert(TOTAL_TEXTURE_BUFFER == SCREEN_MEM_SZ * (8 * 8) * BYTES_PER_PIXEL);
 
-    for (int j=0; j<SCREEN_MATRIX_Y; j++) {
-        for (uint i=0; i<SCREEN_MATRIX_X; i++) {
-            for (int line=0; line<8; line++) {
+    //Do this like a raster video system for now
+    for (int j=0; j<SCREEN_MATRIX_Y; j++) { // all rows
+        for (int line=0; line<8; line++) { // one row of characters
+            for (uint i=0; i<SCREEN_MATRIX_X; i++) { // one raster line
                 plot_character_line(&p, SRCEEN_RAM_mem[i + j*SCREEN_MATRIX_X], line);
             }
         }
-        
+
 
     }
 }
@@ -33,6 +34,7 @@ assert(TOTAL_TEXTURE_BUFFER == SCREEN_MEM_SZ * (8 * 8) * BYTES_PER_PIXEL);
 
 int _screen_get_screencode_pos(int screencode, uint8_t line) {
 assert(line < 8);
+assert(screencode < (CHAR_ROM_SZ/8));
 
     return (screencode * 8 + line);
 }
