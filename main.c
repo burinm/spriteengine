@@ -14,6 +14,9 @@
 #include "spriteengine.h"
 
 static volatile int running = 1;
+static volatile int vsync_running = 0;
+static uint32_t do_vsync(uint32_t interval, void* param);
+
 int main() {
 
 
@@ -164,5 +167,22 @@ while(running) {
     }
 }
 
+SDL_RemoveTimer(timer_vsync);
+while(vsync_running); //make sure last timer has stopped
+
 g_done();
+}
+
+static uint32_t do_vsync(uint32_t interval, void* param) {
+    vsync_running = 1;
+    vsync_params_t *v_param = (vsync_params_t*)param;
+
+    //msync(SRCEEN_RAM_mem, SCREEN_MEM_SZ, MS_SYNC);
+    screen_render_from_matrix(v_param->pixels);
+
+    g_update_renderer(v_param->pixels);
+
+//printf("tick\n");
+    vsync_running = 0;
+return (interval);
 }

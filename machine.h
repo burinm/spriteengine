@@ -67,8 +67,5 @@ int machine_init_mem(void);
 
 void machine_clear_screen_matrix(void);
 
-//callbacks
-uint32_t do_vsync(uint32_t interval, void* param);
-
 #endif
 
