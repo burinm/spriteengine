@@ -13,9 +13,6 @@
 #include "machine.h"
 #include "spriteengine.h"
 
-#define WINDOW_SCALE    (2)
-#define SURFACE_DEPTH   (4)
-
 static volatile int running = 1;
 int main() {
 
@@ -26,54 +23,25 @@ if (machine_init_mem() != 0) {
     return -1;
 }
 
-SDL_Init(SDL_INIT_VIDEO);
-
-SDL_Window *w;
-SDL_Renderer *r;
-
-#define SCREEN_X        (RESOLUTION_X * WINDOW_SCALE)
-#define SCREEN_Y        (RESOLUTION_Y * WINDOW_SCALE)
-if (SDL_CreateWindowAndRenderer(
-                SCREEN_X, SCREEN_Y,
-                SDL_WINDOW_RESIZABLE,
-                &w,
-                &r) != 0) {
-    printf("Unable to create window! %s\n", SDL_GetError());
-};
-
-if (w == NULL) {
-    printf("Window Null!\n");
+if (g_init() == -1) {
+    printf("Could not initialize SDL2 and open window\n");
     return -1;
 }
 
-g_clear_render(r);
-
-SDL_Texture *t = SDL_CreateTexture(
-        r,
-        SDL_PIXELFORMAT_RGB888,
-        //SDL_PIXELFORMAT_RGB332,
-        SDL_TEXTUREACCESS_STREAMING,
-        RESOLUTION_X, RESOLUTION_Y);
-
-if(t == NULL) {
-    printf("Texture Null: %s\n", SDL_GetError());
-    return -1;
-}
-
-
-uint8_t *pixels = malloc(TOTAL_TEXTURE_BUFFER * sizeof(uint8_t));
+uint8_t *pixels = g_texture_init();
 if (pixels == NULL) {
-    printf("Coudlnt' allocate pixel buffer!\n");
     return -1;
 }
 
 //Go!
 
 //start vsync timer
-#if 0
+#if 1
+#define VSYNC_RATE_MS   (17)
+//#define VSYNC_RATE_MS   (1000)
 vsync_params_t vp_t = { .pixels = pixels };
 SDL_TimerID timer_vsync;
-if ( (timer_vsync = SDL_AddTimer(17, do_vsync, &vp_t)) == 0) {
+if ( (timer_vsync = SDL_AddTimer(VSYNC_RATE_MS, do_vsync, &vp_t)) == 0) {
     printf("Couldn't start v_sync timer\n");
     return -1;
 }
@@ -183,11 +151,7 @@ while(running) {
                 }
 
                 //Always update renderer
-                    SDL_UpdateTexture(t, NULL, pixels, TEXTURE_PITCH);
-
-                    SDL_RenderClear(r);
-                    SDL_RenderCopy(r, t, NULL, NULL);
-                    SDL_RenderPresent(r);
+                    g_update_renderer(pixels);
                 break;
             case SDL_QUIT:
                 running = 0;
@@ -200,10 +164,5 @@ while(running) {
     }
 }
 
-//SDL_FreeSurface(srgb);
-if(pixels) { free(pixels); }
-SDL_DestroyTexture(t);
-
-SDL_DestroyWindow(w);
-SDL_Quit();
+g_done();
 }

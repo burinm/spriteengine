@@ -9,6 +9,7 @@
 
 #include "machine.h"
 #include "screen_matrix.h" //TODO: refactor, is this a dependency
+#include "graphics.h" //only for g_update_renderer - refactor?
 
 /* Got these from here:
 https://lospec.com/palette-list/nintendo-entertainment-system
@@ -35,12 +36,13 @@ int machine_init_mem() {
 
 //Screen memory
 
-int screen_fd = open("mem/screen", O_CREAT | O_RDWR);
+int screen_fd = shm_open("/screen_mem", O_CREAT | O_RDWR, S_IRWXU);
 if (screen_fd == -1) {
     perror("couldn't open screen file:");
     return -1;
 }
 
+#if 0
 //Alternatively, this could be dd'ed from command line
 for (int i=0; i<SCREEN_MEM_SZ; i++) {
     if (write(screen_fd, "\0", 1) == -1) {
@@ -48,6 +50,12 @@ for (int i=0; i<SCREEN_MEM_SZ; i++) {
         goto error;
         return -1;
     }
+}
+#endif
+if (ftruncate(screen_fd, SCREEN_MEM_SZ) == -1) {
+        perror("couldn't set screen memory size:");
+        goto error;
+        return -1;
 }
 
 struct stat stat_buf;
@@ -115,12 +123,15 @@ if (CHARACTER_ROM_mem == MAP_FAILED) {
 printf("[%p] - [character ROM] (page size %zu) mmap (file size %zu bytes)\n", CHARACTER_ROM_mem, page_sz, length);
 
 
-return 0;
 
 error:
     //TODO clean up mmap and other resources
-    close(screen_fd);
-    return -1;
+    //close(screen_fd);
+    if (shm_unlink("SCREEN_MEM_HANDLE") == -1) {
+        perror("couldn't unlink screen memory:");;
+    }
+    //return -1;
+return 0;
 }
 
 void machine_clear_screen_matrix(void) {
@@ -135,6 +146,9 @@ uint32_t do_vsync(uint32_t interval, void* param) {
 
     //msync(SRCEEN_RAM_mem, SCREEN_MEM_SZ, MS_SYNC);
     screen_render_from_matrix(v_param->pixels);
+
+    g_update_renderer(v_param->pixels);
+
 //printf("tick\n");
 return (interval);
 }

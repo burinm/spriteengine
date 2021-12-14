@@ -10,11 +10,25 @@
 #define TEXTURE_PITCH   (RESOLUTION_X * BYTES_PER_PIXEL)
 #define TOTAL_TEXTURE_BUFFER (TEXTURE_PITCH * RESOLUTION_Y)
 
+#define WINDOW_SCALE    (2)
+//#define SURFACE_DEPTH   (4)
+
+#define SCREEN_X        (RESOLUTION_X * WINDOW_SCALE)
+#define SCREEN_Y        (RESOLUTION_Y * WINDOW_SCALE)
+
+
 
 #include "SDL2/SDL.h"
 
 void g_clear_screen(SDL_Surface *);
 void g_clear_render(SDL_Renderer *);
+
+void g_update_renderer(uint8_t *pixels);
+
+int g_init();
+uint8_t * g_texture_init();
+
+void g_done();
 
 
 #endif

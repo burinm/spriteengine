@@ -5,6 +5,7 @@
 #include "machine.h"
 
 void screen_render_from_matrix(uint8_t *p) {
+#if 0
 size_t total_pixels = \
       (SCREEN_TILE_Y_OFFSET * TILE_SZ * RESOLUTION_X + \
        SCREEN_TILE_Y_OFFSET * TILE_SZ * RESOLUTION_X + \
@@ -18,6 +19,7 @@ if (total_pixels * BITS_PER_PIXEL != TOTAL_TEXTURE_BUFFER) {
     printf("texture buffer size:%d, planned to blit:%zu\n", TOTAL_TEXTURE_BUFFER, total_pixels * BITS_PER_PIXEL);
     //assert(0);
 }
+#endif
 
     //Do this like a raster video system for now
 
