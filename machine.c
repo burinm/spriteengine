@@ -124,14 +124,14 @@ printf("[%p] - [character ROM] (page size %zu) mmap (file size %zu bytes)\n", CH
 
 
 
+return 0;
+
 error:
     //TODO clean up mmap and other resources
-    //close(screen_fd);
     if (shm_unlink("SCREEN_MEM_HANDLE") == -1) {
         perror("couldn't unlink screen memory:");;
     }
-    //return -1;
-return 0;
+return -1;
 }
 
 void machine_clear_screen_matrix(void) {
