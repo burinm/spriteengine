@@ -6,7 +6,6 @@
 #include "SDL2/SDL_keycode.h"
 
 #include "graphics.h"
-#include "blitz_n_chips.h"
 #include "machine.h"
 #include "screen_matrix.h"
 

@@ -4,6 +4,8 @@
 #include "graphics.h" //Just for assert, TOTAL_TEXTURE_BUFFER
 #include "machine.h"
 
+static volatile uint8_t *_video_ctrl = VIDEO_CTRL;
+
 void screen_render_from_matrix(uint8_t *p) {
 #if 0
 size_t total_pixels = \
@@ -33,6 +35,8 @@ if (total_pixels * BITS_PER_PIXEL != TOTAL_TEXTURE_BUFFER) {
             h_blank(&p, SCREEN_TILE_X_OFFSET * TILE_SZ);
 
             for (int i=SCREEN_TILE_X_OFFSET; i<SCREEN_MATRIX_X - SCREEN_TILE_X_OFFSET; i++) { // visible section
+                //x_Scroll(&p, video_ctrl[SE_SCROLL_X]);
+                
                 plot_character_line(&p, SRCEEN_RAM_mem[i + j*SCREEN_MATRIX_X], line);
             }
 

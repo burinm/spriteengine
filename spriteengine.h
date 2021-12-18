@@ -3,6 +3,14 @@
 
 #include <stdint.h>
 
+//Sprite Engine Registers
+#define SE_REG_SZ               (512)
+
+//Register relative address
+#define SE_BACKGROUND_COLOR     (0x0) 
+#define SE_SCROLL_X             (0x1) 
+#define SE_SCROLL_Y             (0x1) 
+
 void screen_render_from_matrix(uint8_t *p);
 
 void v_blank(uint8_t **p, int lines, int color);

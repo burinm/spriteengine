@@ -1,0 +1,7 @@
+tags
+cscope.files
+cscope.out
+demo
+*.o
+core
+*.swp

@@ -1,6 +1,7 @@
 #ifndef __MACHINE_H__
 #define __MACHINE_H__
 
+#include "spriteengine.h" // backwards, spriteengine defines video ctlr register size
 #include <stdint.h>
 
 //Resolution of machine output - fixed (qvga)
@@ -16,6 +17,11 @@ const volatile uint8_t* CHARACTER_ROM_mem;
 #define PALLET_COLOR_NES_WHITE  (0x1)
 #define PALLET_ROM_SZ     (64)
 const volatile uint32_t PALLET_ROM_mem[PALLET_ROM_SZ];
+
+//SpriteEngine mapped memory (control registers)
+volatile uint8_t VIDEO_CTRL[SE_REG_SZ];
+
+
 
 //Screen RAM memory (nametable), called matix in this implementation
 #define TILE_SZ (8)
