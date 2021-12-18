@@ -97,3 +97,43 @@ void plot_character_line(uint8_t **p, uint8_t screencode, uint8_t line) {
         }
     }
 }
+
+void display_character_rom(uint8_t *p) {
+//TODO: This isn't raster friendly
+    int pos_x = 0;
+    int pos_y = 0;
+    int rom = 0;
+    uint8_t *px = NULL;
+    do {
+        for (int k=0; k<8; k++) {
+            int v = k * RESOLUTION_X * BYTES_PER_PIXEL;
+            px = p + v + pos_x + pos_y;
+            for (int j=0; j<8; j++) {
+                int h = (j * BYTES_PER_PIXEL);
+
+                if ( (v + h + pos_x + pos_y + BYTES_PER_PIXEL) >= TOTAL_TEXTURE_BUFFER) {
+                    printf("overrun!\n");
+                    goto bail;
+                }
+
+                // One bit of character, highest bit first
+                if (CHARACTER_ROM_mem[rom] & (1<<(7-j))) {
+                    plot_pixel(&px, PALLET_COLOR_NES_WHITE);
+                } else {
+                    plot_pixel(&px, PALLET_COLOR_NES_BLACK);
+                }
+            }
+            rom++; //Next line of character
+            px -= (8 * BYTES_PER_PIXEL);
+            px += (RESOLUTION_X * BYTES_PER_PIXEL);
+        }
+        // Next character
+        pos_x += 8 * BYTES_PER_PIXEL;
+        if (pos_x > ((RESOLUTION_X * BYTES_PER_PIXEL) - (BYTES_PER_PIXEL * 8))) {
+            pos_x = 0;
+            pos_y += RESOLUTION_X * BYTES_PER_PIXEL * 8;
+        }
+        printf("pos_x %d, pos_y %d\n", pos_x, pos_y);
+    } while (rom < CHAR_ROM_SZ -1);
+    bail:;
+}

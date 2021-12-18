@@ -15,7 +15,12 @@
 
 static volatile int running = 1;
 static volatile int vsync_running = 0;
+
+//#define AUTO_SYNC
+
+#ifdef AUTO_SYNC
 static uint32_t do_vsync(uint32_t interval, void* param);
+#endif
 
 int main() {
 
@@ -39,7 +44,7 @@ if (pixels == NULL) {
 //Go!
 
 //start vsync timer
-#if 1
+#ifdef AUTO_SYNC
 #define VSYNC_RATE_MS   (17)
 //#define VSYNC_RATE_MS   (1000)
 vsync_params_t vp_t = { .pixels = pixels };
@@ -77,15 +82,10 @@ while(running) {
                     case SDLK_r: //Render screen from matrix 
                         screen_render_from_matrix(pixels);
                         break;
-                    case SDLK_e: //Render screen from matrix 
+                    case SDLK_e: //Clear screen
                         machine_clear_screen_matrix();
                         break;
                     case SDLK_b:{  //blit
-                        /*
-                        for (int i=0; i<TOTAL_SCREEN_BUFFER; i++) {
-                            pixels[i] = rand() %255;
-                        }
-                        */
                         uint8_t* _p = pixels;
                         int counter = 0;
                         for (int j=0; j<RESOLUTION_Y; j++) {
@@ -98,51 +98,13 @@ while(running) {
                     }
 
                         break;
-                    case SDLK_t:
+                    case SDLK_t: //paint screen grey
                         for (int i=0; i<TOTAL_TEXTURE_BUFFER; i++) {
                             pixels[i] = 0xee;
                         }
                         break;
-                    case SDLK_u: {
-                        int pos_x = 0;
-                        int pos_y = 0;
-                        int rom = 0;
-                        do {
-                            for (int k=0; k<8; k++) {
-                                int v = k * RESOLUTION_X * BYTES_PER_PIXEL;
-                                for (int j=0; j<8; j++) { 
-                                    int h = (j * BYTES_PER_PIXEL);
-
-                                    if ( (v + h + pos_x + pos_y + BYTES_PER_PIXEL) >= TOTAL_TEXTURE_BUFFER) {
-                                        printf("overrun!\n");
-                                        goto bail;
-                                    }
-
-                                    // One bit of character, highest bit first
-                                    if (CHARACTER_ROM_mem[rom] & (1<<(7-j))) {
-                                        pixels[v+h+0 + pos_x + pos_y] = 0xff; 
-                                        pixels[v+h+1 + pos_x + pos_y] = 0xff;
-                                        pixels[v+h+2 + pos_x + pos_y] = 0xff;
-                                        pixels[v+h+3 + pos_x + pos_y] = 0;
-                                    } else {
-                                        pixels[v+h+0 + pos_x + pos_y] = 0;
-                                        pixels[v+h+1 + pos_x + pos_y] = 0;
-                                        pixels[v+h+2 + pos_x + pos_y] = 0;
-                                        pixels[v+h+3 + pos_x + pos_y] = 0;
-                                    }
-                                }
-                                rom++; //Next line of character
-                            }
-                            // Next character
-                            pos_x += 8 * BYTES_PER_PIXEL;
-                            if (pos_x > ((RESOLUTION_X * BYTES_PER_PIXEL) - (BYTES_PER_PIXEL * 8))) {
-                                pos_x = 0;
-                                pos_y += RESOLUTION_X * BYTES_PER_PIXEL * 8;
-                            }
-                            printf("pos_x %d, pos_y %d\n", pos_x, pos_y);
-                        } while (rom < CHAR_ROM_SZ -1);
-                    }
-                        bail:
+                    case SDLK_u: //Display character rom on screen
+                        display_character_rom(pixels);
                         break;
                     case SDLK_c: //clear
                         for (int i=0; i<TOTAL_TEXTURE_BUFFER; i++) {
@@ -167,12 +129,15 @@ while(running) {
     }
 }
 
+#ifdef AUTO_SYNC
 SDL_RemoveTimer(timer_vsync);
 while(vsync_running); //make sure last timer has stopped
+#endif
 
 g_done();
 }
 
+#ifdef AUTO_SYNC
 static uint32_t do_vsync(uint32_t interval, void* param) {
     vsync_running = 1;
     vsync_params_t *v_param = (vsync_params_t*)param;
@@ -186,3 +151,4 @@ static uint32_t do_vsync(uint32_t interval, void* param) {
     vsync_running = 0;
 return (interval);
 }
+#endif
