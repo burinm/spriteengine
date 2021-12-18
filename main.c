@@ -64,6 +64,10 @@ while(running) {
                         running = 0;
                         printf("stopping...\n");
                         break;
+                    case SDLK_k:
+                        VIDEO_CTRL[SE_SCROLL_X] = ++VIDEO_CTRL[SE_SCROLL_X] & 0x7;
+                        printf("[SE_SCROLL_X] = %u\n",VIDEO_CTRL[SE_SCROLL_X]);
+                        break;
                     case SDLK_l: //load screen matrix
                         if (load_screen_matrix("sample_matrix.bg") != 0) {
                             printf("couldn't load: sample_matrix.bg\n");

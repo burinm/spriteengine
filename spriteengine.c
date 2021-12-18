@@ -93,13 +93,28 @@ int _dots = 0;
     int j = line / 8;
 
     // x_scan should really be the dot number for the line
-    for (int x_scan=0; x_scan<SCREEN_MATRIX_X -2; x_scan++) {
+    for (int x_scan=0; x_scan<(SCREEN_MATRIX_X -2) * TILE_SZ; x_scan += TILE_SZ) {
 
-        int i = x_scan; 
-        int screencode = SRCEEN_RAM_mem[i + j*SCREEN_MATRIX_X];
+        int screencode_left;
+        int screencode_right;
+        uint8_t segment;
 
-        // line % 8, is expensive
-        uint8_t segment = CHARACTER_ROM_mem[_screen_get_screencode_pos(screencode, line%8)];
+        int i = (x_scan + _video_ctrl[SE_SCROLL_X]) / 8;
+        int i_part = (x_scan  + _video_ctrl[SE_SCROLL_X]) % 8;
+
+            // line % 8, is expensive
+        if (i_part == 0) {
+            screencode_right = SRCEEN_RAM_mem[i + j*SCREEN_MATRIX_X];
+            segment = CHARACTER_ROM_mem[_screen_get_screencode_pos(screencode_right, line%8)];
+        } else {
+            screencode_left =  SRCEEN_RAM_mem[i + j*SCREEN_MATRIX_X];
+            screencode_right = SRCEEN_RAM_mem[(i+1) + j*SCREEN_MATRIX_X];
+            uint8_t segment_left = CHARACTER_ROM_mem[_screen_get_screencode_pos(screencode_left, line%8)];
+            uint8_t segment_right = CHARACTER_ROM_mem[_screen_get_screencode_pos(screencode_right, line%8)];
+            segment = (segment_left << i_part) | (segment_right >> (TILE_SZ - i_part));
+        }
+
+
         for (int i=0; i<TILE_SZ; i++) {
             if (segment & (1<<(7-i))) {
                 _dots += plot_pixel(p, PALLET_COLOR_NES_WHITE);
