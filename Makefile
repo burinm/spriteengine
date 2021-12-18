@@ -12,7 +12,7 @@ main.o: main.c
 graphics.o: graphics.c
 	gcc ${INCLUDES} -c $^ -o $@
 
-machine..o: machine..c
+machine.o: machine.c
 	gcc ${INCLUDES} -c $^ -o $@
 
 screen_matrix.o: screen_matrix.c
