@@ -19,6 +19,8 @@ int _dots = 0;
 
         //start raster line
             _dots += h_blank(&p, SCREEN_TILE_X_OFFSET * TILE_SZ);
+            _dots += h_blank(&p, SCREEN_TILE_X_OFFSET * TILE_SZ);
+            _dots += h_blank(&p, SCREEN_TILE_X_OFFSET * TILE_SZ);
 
             for (int i=SCREEN_TILE_X_OFFSET; i<SCREEN_MATRIX_X - SCREEN_TILE_X_OFFSET; i++) { // visible section
                 //x_Scroll(&p, video_ctrl[SE_SCROLL_X]);
@@ -26,8 +28,6 @@ int _dots = 0;
                 _dots += plot_character_line(&p, SRCEEN_RAM_mem[i + j*SCREEN_MATRIX_X], line);
             }
 
-            _dots += h_blank(&p, SCREEN_TILE_X_OFFSET * TILE_SZ);
-            _dots += h_blank(&p, SCREEN_TILE_X_OFFSET * TILE_SZ);
             _dots += h_blank(&p, SCREEN_TILE_X_OFFSET * TILE_SZ);
             _dots += h_blank(&p, SCREEN_TILE_X_OFFSET * TILE_SZ);
             _dots += h_blank(&p, SCREEN_TILE_X_OFFSET * TILE_SZ);
