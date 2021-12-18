@@ -85,8 +85,11 @@ while(running) {
                     case SDLK_r: //Render screen from matrix 
                         screen_render_from_matrix(pixels);
                         break;
-                    case SDLK_e: //Clear screen
+                    case SDLK_e: //Clear matrix
                         machine_clear_screen_matrix();
+                        break;
+                    case SDLK_p: //pattern to matrix
+                        machine_pattern_screen_matrix();
                         break;
                     case SDLK_b:{  //blit
                         uint8_t* _p = pixels;

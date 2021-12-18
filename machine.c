@@ -138,5 +138,14 @@ void machine_clear_screen_matrix(void) {
     for (int i=0; i<SCREEN_MEM_SZ; i++) {
         SRCEEN_RAM_mem[i] = 0;
     }
+}
 
+void machine_pattern_screen_matrix(void) {
+    int alpha = 0;
+    for (int j=0; j<SCREEN_MATRIX_Y; j++) {
+        for (int i=0; i<SCREEN_MATRIX_X; i++) {
+            SRCEEN_RAM_mem[i + j*SCREEN_MATRIX_X] = alpha;
+            alpha++; if (alpha == 26) { alpha = 0; }
+        }
+    }
 }

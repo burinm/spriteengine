@@ -72,6 +72,7 @@ typedef struct {
 int machine_init_mem(void);
 
 void machine_clear_screen_matrix(void);
+void machine_pattern_screen_matrix(void);
 
 #endif
 
