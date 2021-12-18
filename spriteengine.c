@@ -10,23 +10,21 @@ void screen_render_from_matrix(uint8_t *p) {
     //Do this like a raster video system for now
 
 int _dots = 0;
+
+    int line = 0;
     // "v_blank" at top - but not really, we are writing black pixels
     _dots += v_blank(&p, SCREEN_TILE_Y_OFFSET * TILE_SZ, PALLET_COLOR_NES_BLACK);
     _dots += v_blank(&p, SCREEN_TILE_Y_OFFSET * TILE_SZ, PALLET_COLOR_NES_BLACK);
 
     for (int j=SCREEN_TILE_Y_OFFSET; j<SCREEN_MATRIX_Y - SCREEN_TILE_Y_OFFSET; j++) { // all rows
-        for (int line=0; line<8; line++) { // one row of characters
+        for (int character_row=0; character_row<8; character_row++) { // one row of characters
 
         //start raster line
             _dots += h_blank(&p, SCREEN_TILE_X_OFFSET * TILE_SZ);
             _dots += h_blank(&p, SCREEN_TILE_X_OFFSET * TILE_SZ);
             _dots += h_blank(&p, SCREEN_TILE_X_OFFSET * TILE_SZ);
 
-            for (int i=SCREEN_TILE_X_OFFSET; i<SCREEN_MATRIX_X - SCREEN_TILE_X_OFFSET; i++) { // visible section
-                //x_Scroll(&p, video_ctrl[SE_SCROLL_X]);
-                
-                _dots += plot_character_line(&p, SRCEEN_RAM_mem[i + j*SCREEN_MATRIX_X], line);
-            }
+            _dots += plot_raster_line(&p, line++);
 
             _dots += h_blank(&p, SCREEN_TILE_X_OFFSET * TILE_SZ);
             _dots += h_blank(&p, SCREEN_TILE_X_OFFSET * TILE_SZ);
@@ -88,15 +86,26 @@ int plot_pixel(uint8_t **p, int color) {
 return 1;
 }
 
-int plot_character_line(uint8_t **p, uint8_t screencode, uint8_t line) {
+int plot_raster_line(uint8_t **p, uint16_t line) {
 
 int _dots = 0;
 
-    for (int i=0; i<8; i++) {
-        if (CHARACTER_ROM_mem[_screen_get_screencode_pos(screencode, line)] & (1<<(7-i))) {
-            _dots += plot_pixel(p, PALLET_COLOR_NES_WHITE);
-        } else {
-            _dots += plot_pixel(p, PALLET_COLOR_NES_BLACK);
+    int j = line / 8;
+
+    // x_scan should really be the dot number for the line
+    for (int x_scan=0; x_scan<SCREEN_MATRIX_X -2; x_scan++) {
+
+        int i = x_scan; 
+        int screencode = SRCEEN_RAM_mem[i + j*SCREEN_MATRIX_X];
+
+        // line % 8, is expensive
+        uint8_t segment = CHARACTER_ROM_mem[_screen_get_screencode_pos(screencode, line%8)];
+        for (int i=0; i<TILE_SZ; i++) {
+            if (segment & (1<<(7-i))) {
+                _dots += plot_pixel(p, PALLET_COLOR_NES_WHITE);
+            } else {
+                _dots += plot_pixel(p, PALLET_COLOR_NES_BLACK);
+            }
         }
     }
 

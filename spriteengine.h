@@ -17,7 +17,7 @@ int v_blank(uint8_t **p, int lines, int color);
 int h_blank(uint8_t **p, int dots);
 
 int plot_pixel(uint8_t **p, int color);
-int plot_character_line(uint8_t **p, uint8_t screencode, uint8_t line);
+int plot_raster_line(uint8_t **p, uint16_t line);
 
 void display_character_rom(uint8_t *p);
 
