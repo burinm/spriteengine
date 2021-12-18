@@ -7,64 +7,61 @@
 static volatile uint8_t *_video_ctrl = VIDEO_CTRL;
 
 void screen_render_from_matrix(uint8_t *p) {
-#if 0
-size_t total_pixels = \
-      (SCREEN_TILE_Y_OFFSET * TILE_SZ * RESOLUTION_X + \
-       SCREEN_TILE_Y_OFFSET * TILE_SZ * RESOLUTION_X + \
-       (SCREEN_TILE_X_OFFSET * TILE_SZ + \
-        SCREEN_TILE_X_OFFSET * TILE_SZ +  \
-        (SCREEN_MATRIX_X - SCREEN_TILE_X_OFFSET *2) * TILE_SZ) *
-                        (SCREEN_MATRIX_Y - SCREEN_TILE_Y_OFFSET *2));
-
-
-if (total_pixels * BITS_PER_PIXEL != TOTAL_TEXTURE_BUFFER) {
-    printf("texture buffer size:%d, planned to blit:%zu\n", TOTAL_TEXTURE_BUFFER, total_pixels * BITS_PER_PIXEL);
-    //assert(0);
-}
-#endif
-
     //Do this like a raster video system for now
 
+int _dots = 0;
     // "v_blank" at top - but not really, we are writing black pixels
-    v_blank(&p, SCREEN_TILE_Y_OFFSET * TILE_SZ, PALLET_COLOR_NES_BLACK);
+    _dots += v_blank(&p, SCREEN_TILE_Y_OFFSET * TILE_SZ, PALLET_COLOR_NES_BLACK);
+    _dots += v_blank(&p, SCREEN_TILE_Y_OFFSET * TILE_SZ, PALLET_COLOR_NES_BLACK);
 
     for (int j=SCREEN_TILE_Y_OFFSET; j<SCREEN_MATRIX_Y - SCREEN_TILE_Y_OFFSET; j++) { // all rows
         for (int line=0; line<8; line++) { // one row of characters
 
         //start raster line
-            h_blank(&p, SCREEN_TILE_X_OFFSET * TILE_SZ);
+            _dots += h_blank(&p, SCREEN_TILE_X_OFFSET * TILE_SZ);
 
             for (int i=SCREEN_TILE_X_OFFSET; i<SCREEN_MATRIX_X - SCREEN_TILE_X_OFFSET; i++) { // visible section
                 //x_Scroll(&p, video_ctrl[SE_SCROLL_X]);
                 
-                plot_character_line(&p, SRCEEN_RAM_mem[i + j*SCREEN_MATRIX_X], line);
+                _dots += plot_character_line(&p, SRCEEN_RAM_mem[i + j*SCREEN_MATRIX_X], line);
             }
 
-            h_blank(&p, SCREEN_TILE_X_OFFSET * TILE_SZ);
-            h_blank(&p, SCREEN_TILE_X_OFFSET * TILE_SZ);
-            h_blank(&p, SCREEN_TILE_X_OFFSET * TILE_SZ);
-            h_blank(&p, SCREEN_TILE_X_OFFSET * TILE_SZ);
-            h_blank(&p, SCREEN_TILE_X_OFFSET * TILE_SZ);
+            _dots += h_blank(&p, SCREEN_TILE_X_OFFSET * TILE_SZ);
+            _dots += h_blank(&p, SCREEN_TILE_X_OFFSET * TILE_SZ);
+            _dots += h_blank(&p, SCREEN_TILE_X_OFFSET * TILE_SZ);
+            _dots += h_blank(&p, SCREEN_TILE_X_OFFSET * TILE_SZ);
+            _dots += h_blank(&p, SCREEN_TILE_X_OFFSET * TILE_SZ);
         //end raster line
         }
     }
 
     // "v_blank" at bottom
-    v_blank(&p, SCREEN_TILE_Y_OFFSET * TILE_SZ, PALLET_COLOR_NES_BLACK);
+    _dots += v_blank(&p, SCREEN_TILE_Y_OFFSET * TILE_SZ, PALLET_COLOR_NES_BLACK);
+    _dots += v_blank(&p, SCREEN_TILE_Y_OFFSET * TILE_SZ, PALLET_COLOR_NES_BLACK);
+
+printf("rendered %d dots =? %d\n", _dots, RESOLUTION_X * RESOLUTION_Y);
+if (_dots != RESOLUTION_X * RESOLUTION_Y) { printf("!!! scan wrong size !!!\n"); }
 }
 
-void v_blank(uint8_t **p, int lines, int color) {
+int v_blank(uint8_t **p, int lines, int color) {
+int _dots = 0;
+
     for (int j=0; j<lines; j++) {
         for (int i=0; i<RESOLUTION_X; i++) { // one raster line
-           plot_pixel(p, color);
+           _dots += plot_pixel(p, color);
         }
     }
+
+return _dots;
 }
 
-void h_blank(uint8_t **p, int dots) {
+int h_blank(uint8_t **p, int dots) {
+int _dots =0;
+
     for (int j=0; j<dots; j++) {
-        plot_pixel(p, PALLET_COLOR_NES_BLACK);
+        _dots += plot_pixel(p, PALLET_COLOR_NES_BLACK);
     }
+return _dots;
 }
 
 int _screen_get_screencode_pos(int screencode, uint8_t line) {
@@ -88,18 +85,22 @@ int plot_pixel(uint8_t **p, int color) {
     *(*p)++ = b;
     *(*p)++ = 0; //alpha?
 
-return 4;
+return 1;
 }
 
-void plot_character_line(uint8_t **p, uint8_t screencode, uint8_t line) {
+int plot_character_line(uint8_t **p, uint8_t screencode, uint8_t line) {
+
+int _dots = 0;
 
     for (int i=0; i<8; i++) {
         if (CHARACTER_ROM_mem[_screen_get_screencode_pos(screencode, line)] & (1<<(7-i))) {
-            plot_pixel(p, PALLET_COLOR_NES_WHITE);
+            _dots += plot_pixel(p, PALLET_COLOR_NES_WHITE);
         } else {
-            plot_pixel(p, PALLET_COLOR_NES_BLACK);
+            _dots += plot_pixel(p, PALLET_COLOR_NES_BLACK);
         }
     }
+
+return _dots;
 }
 
 void display_character_rom(uint8_t *p) {

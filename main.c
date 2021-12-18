@@ -90,7 +90,7 @@ while(running) {
                         for (int j=0; j<RESOLUTION_Y; j++) {
                             for (int i=0; i<RESOLUTION_X; i++) { //
                                 int pixel_color = rand() %PALLET_ROM_SZ;
-                                counter += plot_pixel(&_p, pixel_color);
+                                counter += plot_pixel(&_p, pixel_color) * BYTES_PER_PIXEL;
                             }
                         }
                         printf("counter = %d is good %d (%d)\n", counter, counter == TOTAL_TEXTURE_BUFFER, TOTAL_TEXTURE_BUFFER);
