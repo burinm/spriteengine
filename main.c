@@ -163,9 +163,10 @@ static uint32_t do_vsync(uint32_t interval, void* param) {
         level_fine_control = 0;
         level_loc++;
         if (level_loc > 100) {
-            level_loc = -30;
+            level_loc = 0;
         }
-        load_screen_matrix_from_memory(level_loc);
+        matrix_scroll_left();
+        load_screen_matrix_on_right_from_memory(level_loc);
     }
     VIDEO_CTRL[SE_SCROLL_X] = level_fine_control;
 

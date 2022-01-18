@@ -5,7 +5,8 @@
 
 int load_screen_matrix(const char*);
 void screen_render_from_matrix(uint8_t *);
-
-void load_screen_matrix_from_memory(size_t offset);
+ 
+void matrix_scroll_left();
+void load_screen_matrix_on_right_from_memory(size_t offset);
 
 #endif

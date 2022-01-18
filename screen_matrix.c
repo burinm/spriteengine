@@ -40,18 +40,25 @@ int matrix_fd = open(matrix, O_RDONLY);
 return 0;
 }
 
-void load_screen_matrix_from_memory(size_t offset) {
-    int location;
+void load_screen_matrix_on_right_from_memory(size_t offset) {
+    int location_level;
+    int location_screen;
     for (int j=0; j<SCREEN_MATRIX_Y; j++) {
-        for (int i=0; i<SCREEN_MATRIX_X; i++) {
-            if (i + offset < LEVEL_COLS) {
-                location = i + offset + j*LEVEL_COLS;
-                SRCEEN_RAM_mem[i + j*SCREEN_MATRIX_X] =
-                    LEVELMAP_ROM_mem[location];
-            } else {
-                SRCEEN_RAM_mem[i + j*SCREEN_MATRIX_X] = 32;
-            }
+        location_screen = SCREEN_MATRIX_X-1 + j*SCREEN_MATRIX_X;
+        if (offset < LEVEL_COLS) {
+            location_level = offset + j*LEVEL_COLS;
+            SRCEEN_RAM_mem[location_screen] =
+                LEVELMAP_ROM_mem[location_level];
+        } else {
+            SRCEEN_RAM_mem[location_screen] = 32;
         }
     }
+}
 
+void matrix_scroll_left() {
+    for (int j=0; j<SCREEN_MATRIX_Y; j++) {
+        for (int i=0; i < SCREEN_MATRIX_X-1; i++) {
+            SRCEEN_RAM_mem[i + j*SCREEN_MATRIX_X] = SRCEEN_RAM_mem[1 + i + j*SCREEN_MATRIX_X];
+        }
+    }
 }
