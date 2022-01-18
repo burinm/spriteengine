@@ -21,6 +21,11 @@ const volatile uint32_t PALLET_ROM_mem[PALLET_ROM_SZ];
 //SpriteEngine mapped memory (control registers)
 volatile uint8_t VIDEO_CTRL[SE_REG_SZ];
 
+//Test ROM, (cartridge), background test
+#define LEVELMAP_ROM_SZ     (2080)
+const volatile uint8_t* LEVELMAP_ROM_mem;
+#define LEVEL_ROWS 26
+#define LEVEL_COLS 80
 
 
 //Screen RAM memory (nametable), called matix in this implementation

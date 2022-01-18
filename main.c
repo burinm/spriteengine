@@ -15,13 +15,18 @@
 static volatile int running = 1;
 static volatile int vsync_running = 0;
 
-//#define AUTO_SYNC
+// scrolling demo
+static volatile int level_loc=0;
+static volatile int level_fine_control=0;
+
+#define AUTO_SYNC
 
 #ifdef AUTO_SYNC
 static uint32_t do_vsync(uint32_t interval, void* param);
 #endif
 
 int main() {
+
 
 
 
@@ -66,7 +71,11 @@ while(running) {
                         break;
                     case SDLK_k:
                         VIDEO_CTRL[SE_SCROLL_X] = ++VIDEO_CTRL[SE_SCROLL_X] & 0x7;
-                        printf("[SE_SCROLL_X] = %u\n",VIDEO_CTRL[SE_SCROLL_X]);
+                        printf("[SE_SCROLL_X+] = %u\n",VIDEO_CTRL[SE_SCROLL_X]);
+                        break;
+                    case SDLK_j:
+                        VIDEO_CTRL[SE_SCROLL_X] = --VIDEO_CTRL[SE_SCROLL_X] & 0x7;
+                        printf("[SE_SCROLL_X-] = %u\n",VIDEO_CTRL[SE_SCROLL_X]);
                         break;
                     case SDLK_l: //load screen matrix
                         if (load_screen_matrix("sample_matrix.bg") != 0) {
@@ -147,6 +156,19 @@ g_done();
 static uint32_t do_vsync(uint32_t interval, void* param) {
     vsync_running = 1;
     vsync_params_t *v_param = (vsync_params_t*)param;
+
+    //scrolling demo
+    level_fine_control++;
+    if (level_fine_control> 7) {
+        level_fine_control = 0;
+        level_loc++;
+        if (level_loc > 100) {
+            level_loc = -30;
+        }
+        load_screen_matrix_from_memory(level_loc);
+    }
+    VIDEO_CTRL[SE_SCROLL_X] = level_fine_control;
+
 
     //msync(SRCEEN_RAM_mem, SCREEN_MEM_SZ, MS_SYNC);
     screen_render_from_matrix(v_param->pixels);

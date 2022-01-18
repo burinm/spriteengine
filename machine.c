@@ -113,7 +113,7 @@ if (char_fd == -1) {
 }
 
 
-CHARACTER_ROM_mem = mmap(NULL, length, PROT_READ, MAP_PRIVATE, char_fd, 0);   
+CHARACTER_ROM_mem = mmap(NULL, length, PROT_READ, MAP_PRIVATE, char_fd, 0);
 if (CHARACTER_ROM_mem == MAP_FAILED) {
     perror("couldn't mmap character rom:");
     goto error;
@@ -122,7 +122,23 @@ if (CHARACTER_ROM_mem == MAP_FAILED) {
 
 printf("[%p] - [character ROM] (page size %zu) mmap (file size %zu bytes)\n", CHARACTER_ROM_mem, page_sz, length);
 
+// load level cartridge
+int level_fd = open("leveltest.pet", O_RDONLY);
+if (level_fd == -1) {
+    perror("couldn't open level cartridge:");
+    goto error;
+    return -1;
+}
 
+
+LEVELMAP_ROM_mem = mmap(NULL, LEVELMAP_ROM_SZ, PROT_READ, MAP_PRIVATE, level_fd, 0);
+if (CHARACTER_ROM_mem == MAP_FAILED) {
+    perror("couldn't mmap level cartridge:");
+    goto error;
+    return -1;
+}
+
+printf("[%p] - [level ROM]  mmap (file size %zu bytes)\n", LEVELMAP_ROM_mem, (size_t)LEVELMAP_ROM_SZ);
 
 return 0;
 

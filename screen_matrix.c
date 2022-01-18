@@ -39,3 +39,19 @@ int matrix_fd = open(matrix, O_RDONLY);
 
 return 0;
 }
+
+void load_screen_matrix_from_memory(size_t offset) {
+    int location;
+    for (int j=0; j<SCREEN_MATRIX_Y; j++) {
+        for (int i=0; i<SCREEN_MATRIX_X; i++) {
+            if (i + offset < LEVEL_COLS) {
+                location = i + offset + j*LEVEL_COLS;
+                SRCEEN_RAM_mem[i + j*SCREEN_MATRIX_X] =
+                    LEVELMAP_ROM_mem[location];
+            } else {
+                SRCEEN_RAM_mem[i + j*SCREEN_MATRIX_X] = 32;
+            }
+        }
+    }
+
+}
